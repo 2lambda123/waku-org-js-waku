@@ -6,7 +6,8 @@ import {
   IMessage,
   Libp2p,
   ProtocolCreateOptions,
-  SendError
+  ProtocolError,
+  ProtocolResult
 } from "@waku/interfaces";
 import { PushResponse } from "@waku/proto";
 import { isMessageSizeUnderCap } from "@waku/utils";
@@ -25,25 +26,9 @@ const log = new Logger("light-push");
 export const LightPushCodec = "/vac/waku/lightpush/2.0.0-beta1";
 export { PushResponse };
 
-type PreparePushMessageResult =
-  | {
-      query: PushRpc;
-      error: null;
-    }
-  | {
-      query: null;
-      error: SendError;
-    };
+type PreparePushMessageResult = ProtocolResult<"query", PushRpc>;
 
-type CoreSendResult =
-  | {
-      success: null;
-      failure: Failure;
-    }
-  | {
-      success: PeerId;
-      failure: null;
-    };
+type CoreSendResult = ProtocolResult<"success", PeerId, "failure", Failure>;
 
 /**
  * Implements the [Waku v2 Light Push protocol](https://rfc.vac.dev/spec/19/).
@@ -66,12 +51,12 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
     try {
       if (!message.payload || message.payload.length === 0) {
         log.error("Failed to send waku light push: payload is empty");
-        return { query: null, error: SendError.EMPTY_PAYLOAD };
+        return { query: null, error: ProtocolError.EMPTY_PAYLOAD };
       }
 
       if (!(await isMessageSizeUnderCap(encoder, message))) {
         log.error("Failed to send waku light push: message is bigger than 1MB");
-        return { query: null, error: SendError.SIZE_TOO_BIG };
+        return { query: null, error: ProtocolError.SIZE_TOO_BIG };
       }
 
       const protoMessage = await encoder.toProtoObj(message);
@@ -79,7 +64,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
         log.error("Failed to encode to protoMessage, aborting push");
         return {
           query: null,
-          error: SendError.ENCODE_FAILED
+          error: ProtocolError.ENCODE_FAILED
         };
       }
 
@@ -90,7 +75,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
 
       return {
         query: null,
-        error: SendError.GENERIC_FAIL
+        error: ProtocolError.GENERIC_FAIL
       };
     }
   }
@@ -126,7 +111,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
       return {
         success: null,
         failure: {
-          error: SendError.REMOTE_PEER_FAULT,
+          error: ProtocolError.REMOTE_PEER_FAULT,
           peerId: peer.id
         }
       };
@@ -146,7 +131,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
       return {
         success: null,
         failure: {
-          error: SendError.GENERIC_FAIL,
+          error: ProtocolError.GENERIC_FAIL,
           peerId: peer.id
         }
       };
@@ -165,7 +150,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
       return {
         success: null,
         failure: {
-          error: SendError.DECODE_FAILED,
+          error: ProtocolError.DECODE_FAILED,
           peerId: peer.id
         }
       };
@@ -176,7 +161,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
       return {
         success: null,
         failure: {
-          error: SendError.REMOTE_PEER_FAULT,
+          error: ProtocolError.REMOTE_PEER_FAULT,
           peerId: peer.id
         }
       };
@@ -187,7 +172,7 @@ export class LightPushCore extends BaseProtocol implements IBaseProtocolCore {
       return {
         success: null,
         failure: {
-          error: SendError.REMOTE_PEER_REJECTED,
+          error: ProtocolError.REMOTE_PEER_REJECTED,
           peerId: peer.id
         }
       };
