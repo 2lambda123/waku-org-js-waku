@@ -39,7 +39,7 @@ export class ConnectionManager
   private currentActiveParallelDialCount = 0;
   private pendingPeerDialQueue: Array<PeerId> = [];
 
-  private isConnectedToNetwork: boolean = window.navigator.onLine;
+  private isConnectedToNetwork: boolean = false;
   private isConnectedToWakuNetwork: boolean = false;
 
   public static create(
@@ -107,21 +107,26 @@ export class ConnectionManager
   }
 
   public stop(): void {
-    this.keepAliveManager.stopAll();
-    this.libp2p.removeEventListener(
-      "peer:connect",
-      this.onEventHandlers["peer:connect"]
-    );
-    this.libp2p.removeEventListener(
-      "peer:disconnect",
-      this.onEventHandlers["peer:disconnect"]
-    );
-    this.libp2p.removeEventListener(
-      "peer:discovery",
-      this.onEventHandlers["peer:discovery"]
-    );
-    window.removeEventListener("online", this.onEventHandlers["online"]);
-    window.removeEventListener("offline", this.onEventHandlers["offline"]);
+    try {
+      this.keepAliveManager.stopAll();
+      this.libp2p.removeEventListener(
+        "peer:connect",
+        this.onEventHandlers["peer:connect"]
+      );
+      this.libp2p.removeEventListener(
+        "peer:disconnect",
+        this.onEventHandlers["peer:disconnect"]
+      );
+      this.libp2p.removeEventListener(
+        "peer:discovery",
+        this.onEventHandlers["peer:discovery"]
+      );
+
+      window.removeEventListener("online", this.onEventHandlers["online"]);
+      window.removeEventListener("offline", this.onEventHandlers["offline"]);
+    } catch (err) {
+      log.error(`Failed to stop: ${err}`);
+    }
   }
 
   public async dropConnection(peerId: PeerId): Promise<void> {
@@ -345,8 +350,12 @@ export class ConnectionManager
   }
 
   private startBrowserNetworkStatusListener(): void {
-    window.addEventListener("online", this.onEventHandlers["online"]);
-    window.addEventListener("offline", this.onEventHandlers["offline"]);
+    try {
+      window.addEventListener("online", this.onEventHandlers["online"]);
+      window.addEventListener("offline", this.onEventHandlers["offline"]);
+    } catch (err) {
+      log.error(`Failed to add event listener to window: ${err}`);
+    }
   }
 
   private onEventHandlers = {
