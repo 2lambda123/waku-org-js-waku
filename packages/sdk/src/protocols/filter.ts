@@ -4,8 +4,8 @@ import { ConnectionManager, FilterCore } from "@waku/core";
 import {
   type Callback,
   type ContentTopic,
-  CoreProtocolResult,
-  CreateSubscriptionResult,
+  type CoreProtocolResult,
+  type CreateSubscriptionResult,
   EConnectionStateEvents,
   type IAsyncIterator,
   type IDecodedMessage,
@@ -14,13 +14,14 @@ import {
   type IProtoMessage,
   type ISubscriptionSDK,
   type Libp2p,
+  type PeerIdStr,
   type ProtocolCreateOptions,
   ProtocolError,
-  ProtocolUseOptions,
+  type ProtocolUseOptions,
   type PubsubTopic,
-  SDKProtocolResult,
+  type SDKProtocolResult,
   type ShardingParams,
-  SubscribeOptions,
+  type SubscribeOptions,
   type Unsubscribe
 } from "@waku/interfaces";
 import { messageHashStr } from "@waku/message-hash";
@@ -40,9 +41,17 @@ type SubscriptionCallback<T extends IDecodedMessage> = {
   callback: Callback<T>;
 };
 
+type ReceivedMessageHashes = {
+  all: Set<string>;
+  nodes: {
+    [peerId: PeerIdStr]: Set<string>;
+  };
+};
+
 const log = new Logger("sdk:filter");
 
 const DEFAULT_MAX_PINGS = 3;
+const DEFAULT_MAX_MISSED_MESSAGES_THRESHOLD = 3;
 const DEFAULT_KEEP_ALIVE = 30 * 1000;
 
 const DEFAULT_SUBSCRIBE_OPTIONS = {
@@ -52,9 +61,12 @@ const DEFAULT_SUBSCRIBE_OPTIONS = {
 export class SubscriptionManager implements ISubscriptionSDK {
   readonly receivedMessagesHashStr: string[] = [];
   private keepAliveTimer: number | null = null;
+  private readonly receivedMessagesHashes: ReceivedMessageHashes;
   private peerFailures: Map<string, number> = new Map();
+  private missedMessagesByPeer: Map<string, number> = new Map();
   private maxPingFailures: number = DEFAULT_MAX_PINGS;
   private subscribeOptions: SubscribeOptions = DEFAULT_SUBSCRIBE_OPTIONS;
+  private maxMissedMessagesThreshold = DEFAULT_MAX_MISSED_MESSAGES_THRESHOLD;
 
   private contentTopics: ContentTopic[] = [];
   private subscriptionCallbacks: Map<
@@ -68,14 +80,35 @@ export class SubscriptionManager implements ISubscriptionSDK {
     private readonly connectionManager: ConnectionManager,
     private readonly getPeers: () => Peer[],
     private readonly renewPeer: (peerToDisconnect: PeerId) => Promise<Peer>
-  ) {}
+  ) {
+    const allPeerIdStr = this.getPeers().map((p) => p.id.toString());
+    this.receivedMessagesHashes = {
+      all: new Set(),
+      nodes: {
+        ...Object.fromEntries(allPeerIdStr.map((peerId) => [peerId, new Set()]))
+      }
+    };
+    allPeerIdStr.forEach((peerId) => this.missedMessagesByPeer.set(peerId, 0));
+  }
+
+  private addHash(hash: string, peerIdStr?: string): void {
+    this.receivedMessagesHashes.all.add(hash);
+
+    if (peerIdStr) {
+      this.receivedMessagesHashes.nodes[peerIdStr].add(hash);
+    }
+  }
 
   public async subscribe<T extends IDecodedMessage>(
     decoders: IDecoder<T> | IDecoder<T>[],
     callback: Callback<T>,
     options: SubscribeOptions = DEFAULT_SUBSCRIBE_OPTIONS
   ): Promise<SDKProtocolResult> {
+    this.keepAliveTimer = options.keepAlive || DEFAULT_KEEP_ALIVE;
     this.maxPingFailures = options.pingsBeforePeerRenewed || DEFAULT_MAX_PINGS;
+    this.maxMissedMessagesThreshold =
+      options.maxMissedMessagesThreshold ||
+      DEFAULT_MAX_MISSED_MESSAGES_THRESHOLD;
 
     const decodersArray = Array.isArray(decoders) ? decoders : [decoders];
 
@@ -179,11 +212,49 @@ export class SubscriptionManager implements ISubscriptionSDK {
     return finalResult;
   }
 
-  async processIncomingMessage(message: WakuMessage): Promise<void> {
+  private async validateMessage(): Promise<void> {
+    for (const hash of this.receivedMessagesHashes.all) {
+      for (const [peerIdStr, hashes] of Object.entries(
+        this.receivedMessagesHashes.nodes
+      )) {
+        if (!hashes.has(hash)) {
+          this.incrementMissedMessageCount(peerIdStr);
+          if (this.shouldRenewPeer(peerIdStr)) {
+            log.info(
+              `Peer ${peerIdStr} has missed too many messages, renewing.`
+            );
+            const peerId = this.getPeers().find(
+              (p) => p.id.toString() === peerIdStr
+            )?.id;
+            if (!peerId) {
+              log.error(
+                `Unexpected Error: Peer ${peerIdStr} not found in connected peers.`
+              );
+              continue;
+            }
+            try {
+              await this.renewAndSubscribePeer(peerId);
+            } catch (error) {
+              log.error(`Failed to renew peer ${peerIdStr}: ${error}`);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  async processIncomingMessage(
+    message: WakuMessage,
+    peerIdStr: string
+  ): Promise<void> {
     const hashedMessageStr = messageHashStr(
       this.pubsubTopic,
       message as IProtoMessage
     );
+
+    this.addHash(hashedMessageStr, peerIdStr);
+    void this.validateMessage();
+
     if (this.receivedMessagesHashStr.includes(hashedMessageStr)) {
       log.info("Message already received, skipping");
       return;
@@ -276,15 +347,29 @@ export class SubscriptionManager implements ISubscriptionSDK {
     }
   }
 
-  private async renewAndSubscribePeer(peerId: PeerId): Promise<Peer> {
-    const newPeer = await this.renewPeer(peerId);
-    await this.protocol.subscribe(
-      this.pubsubTopic,
-      newPeer,
-      Array.from(this.subscriptionCallbacks.keys())
-    );
+  private async renewAndSubscribePeer(
+    peerId: PeerId
+  ): Promise<Peer | undefined> {
+    try {
+      const newPeer = await this.renewPeer(peerId);
+      await this.protocol.subscribe(
+        this.pubsubTopic,
+        newPeer,
+        Array.from(this.subscriptionCallbacks.keys())
+      );
 
-    return newPeer;
+      this.receivedMessagesHashes.nodes[newPeer.id.toString()] = new Set();
+      this.missedMessagesByPeer.set(newPeer.id.toString(), 0);
+
+      return newPeer;
+    } catch (error) {
+      log.warn(`Failed to renew peer ${peerId.toString()}: ${error}.`);
+      return;
+    } finally {
+      this.peerFailures.delete(peerId.toString());
+      this.missedMessagesByPeer.delete(peerId.toString());
+      delete this.receivedMessagesHashes.nodes[peerId.toString()];
+    }
   }
 
   private startBackgroundProcess(options: SubscribeOptions): void {
@@ -370,6 +455,16 @@ export class SubscriptionManager implements ISubscriptionSDK {
       this.subscribeOptions?.keepAlive || DEFAULT_SUBSCRIBE_OPTIONS.keepAlive
     );
   }
+
+  private incrementMissedMessageCount(peerIdStr: string): void {
+    const currentCount = this.missedMessagesByPeer.get(peerIdStr) || 0;
+    this.missedMessagesByPeer.set(peerIdStr, currentCount + 1);
+  }
+
+  private shouldRenewPeer(peerIdStr: string): boolean {
+    const missedMessages = this.missedMessagesByPeer.get(peerIdStr) || 0;
+    return missedMessages > this.maxMissedMessagesThreshold;
+  }
 }
 
 class FilterSDK extends BaseProtocolSDK implements IFilterSDK {
@@ -385,7 +480,7 @@ class FilterSDK extends BaseProtocolSDK implements IFilterSDK {
   ) {
     super(
       new FilterCore(
-        async (pubsubTopic: PubsubTopic, wakuMessage: WakuMessage) => {
+        async (pubsubTopic, wakuMessage, peerIdStr) => {
           const subscription = this.getActiveSubscription(pubsubTopic);
           if (!subscription) {
             log.error(
@@ -394,7 +489,7 @@ class FilterSDK extends BaseProtocolSDK implements IFilterSDK {
             return;
           }
 
-          await subscription.processIncomingMessage(wakuMessage);
+          await subscription.processIncomingMessage(wakuMessage, peerIdStr);
         },
         libp2p,
         options
