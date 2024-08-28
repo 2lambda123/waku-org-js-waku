@@ -88,7 +88,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@types/chai": "^4.3.11",
+    "@types/chai": "^4.3.19",
     "@types/mocha": "^10.0.6",
     "@waku/build-utils": "*",
     "chai": "^5.1.1",
