@@ -74,7 +74,7 @@
     "@waku/proto": "^0.0.7",
     "@waku/relay": "0.0.13",
     "@waku/utils": "0.0.18",
-    "libp2p": "^1.8.1"
+    "libp2p": "^1.9.3"
   },
   "devDependencies": {
     "@chainsafe/libp2p-gossipsub": "^13.1.0",
