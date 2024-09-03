@@ -67,7 +67,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@noble/hashes": "^1.3.2",
+    "@noble/hashes": "^1.5.0",
     "@waku/interfaces": "0.0.25",
     "chai": "^5.1.1",
     "debug": "^4.3.4",
