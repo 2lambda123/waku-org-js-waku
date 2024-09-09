@@ -82,7 +82,7 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@multiformats/multiaddr": "^12.0.0",
+    "@multiformats/multiaddr": "^12.3.1",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -102,7 +102,7 @@
     "rollup": "^4.21.0"
   },
   "peerDependencies": {
-    "@multiformats/multiaddr": "^12.0.0",
+    "@multiformats/multiaddr": "^12.3.1",
     "libp2p": "^1.8.1",
     "@waku/enr": "^0.0.24",
     "@waku/interfaces": "0.0.25",
