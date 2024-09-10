@@ -64,7 +64,7 @@
     "@waku/interfaces": "0.0.25",
     "chai": "^5.1.1",
     "cspell": "^8.14.2",
-    "fast-check": "^3.19.0",
+    "fast-check": "^3.22.0",
     "ignore-loader": "^0.1.2",
     "isomorphic-fetch": "^3.0.0",
     "mocha": "^10.3.0",

@@ -60,7 +60,7 @@
     "chai-as-promised": "^8.0.0",
     "debug": "^4.3.4",
     "dockerode": "^4.0.2",
-    "fast-check": "^3.19.0",
+    "fast-check": "^3.22.0",
     "p-retry": "^6.1.0",
     "p-timeout": "^6.1.0",
     "portfinder": "^1.0.32",
