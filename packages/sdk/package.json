@@ -81,7 +81,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-replace": "^6.0.1",
     "@waku/build-utils": "*",
     "cspell": "^8.14.2",
     "interface-datastore": "^8.2.10",
