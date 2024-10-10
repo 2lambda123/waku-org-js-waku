@@ -80,7 +80,7 @@
     "@chainsafe/libp2p-gossipsub": "^14.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-replace": "^6.0.1",
     "@waku/build-utils": "*",
     "cspell": "^8.14.4",

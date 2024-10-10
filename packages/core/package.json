@@ -85,7 +85,7 @@
     "@multiformats/multiaddr": "^12.3.1",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "@types/chai": "^4.3.19",
     "@types/debug": "^4.1.12",
     "@types/mocha": "^10.0.6",
