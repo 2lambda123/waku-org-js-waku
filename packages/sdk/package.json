@@ -61,7 +61,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@chainsafe/libp2p-noise": "^15.1.2",
+    "@chainsafe/libp2p-noise": "^16.0.0",
     "@libp2p/bootstrap": "^11.0.5",
     "@libp2p/identify": "^3.0.8",
     "@libp2p/mplex": "^11.0.7",
