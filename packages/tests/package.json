@@ -71,7 +71,7 @@
     "@libp2p/bootstrap": "^11.0.5",
     "@types/chai": "^4.3.19",
     "@types/dockerode": "^3.3.19",
-    "@types/mocha": "^10.0.6",
+    "@types/mocha": "^10.0.9",
     "@types/sinon": "^17.0.3",
     "@types/tail": "^2.2.3",
     "@waku/discovery": "*",
