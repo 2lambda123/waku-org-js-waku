@@ -65,7 +65,7 @@
     "@libp2p/bootstrap": "^11.0.5",
     "@libp2p/identify": "^3.0.8",
     "@libp2p/mplex": "^11.0.10",
-    "@libp2p/ping": "^2.0.8",
+    "@libp2p/ping": "^2.0.10",
     "@libp2p/websockets": "^9.0.10",
     "@noble/hashes": "^1.5.0",
     "@waku/core": "0.0.30",
