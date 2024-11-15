@@ -69,7 +69,7 @@
   "dependencies": {
     "@noble/hashes": "^1.5.0",
     "@waku/interfaces": "0.0.25",
-    "chai": "^5.1.1",
+    "chai": "^5.1.2",
     "debug": "^4.3.7",
     "uint8arrays": "^5.0.1"
   },

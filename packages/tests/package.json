@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@libp2p/bootstrap": "^11.0.10",
-    "@types/chai": "^4.3.19",
+    "@types/chai": "^5.0.1",
     "@types/dockerode": "^3.3.19",
     "@types/mocha": "^10.0.9",
     "@types/sinon": "^17.0.3",
@@ -79,7 +79,7 @@
     "@waku/sdk": "*",
     "allure-commandline": "^2.32.0",
     "allure-mocha": "^3.0.6",
-    "chai": "^5.1.1",
+    "chai": "^5.1.2",
     "cspell": "^8.16.0",
     "datastore-core": "^10.0.2",
     "debug": "^4.3.7",
