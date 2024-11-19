@@ -93,7 +93,7 @@
     "@waku/build-utils": "*",
     "chai": "^5.1.2",
     "cspell": "^8.16.0",
-    "fast-check": "^3.22.0",
+    "fast-check": "^3.23.1",
     "ignore-loader": "^0.1.2",
     "isomorphic-fetch": "^3.0.0",
     "mocha": "^10.8.2",
