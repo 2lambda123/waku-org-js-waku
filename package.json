@@ -58,7 +58,7 @@
     "karma-webkit-launcher": "^2.4.0",
     "karma-webpack": "github:codymikol/karma-webpack#2337a82beb078c0d8e25ae8333a06249b8e72828",
     "lint-staged": "^15.2.10",
-    "playwright": "^1.48.1",
+    "playwright": "^1.49.0",
     "size-limit": "^11.1.6",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
