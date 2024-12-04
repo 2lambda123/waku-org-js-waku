@@ -92,7 +92,7 @@
     "@types/mocha": "^10.0.10",
     "@waku/build-utils": "*",
     "chai": "^5.1.2",
-    "cspell": "^8.16.0",
+    "cspell": "^8.16.1",
     "fast-check": "^3.23.1",
     "mocha": "^10.8.2",
     "npm-run-all": "^4.1.5",
