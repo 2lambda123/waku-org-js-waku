@@ -73,7 +73,7 @@
     "@waku/interfaces": "0.0.25",
     "@waku/proto": "0.0.7",
     "@waku/utils": "0.0.18",
-    "debug": "^4.3.7",
+    "debug": "^4.4.0",
     "it-all": "^3.0.4",
     "it-length-prefixed": "^9.0.4",
     "it-pipe": "^3.0.1",

@@ -56,7 +56,7 @@
     "@waku/enr": "0.0.24",
     "@waku/core": "0.0.30",
     "@waku/utils": "0.0.18",
-    "debug": "^4.3.7",
+    "debug": "^4.4.0",
     "dns-query": "^0.11.2",
     "hi-base32": "^0.5.1",
     "uint8arrays": "^5.0.1"
