@@ -57,7 +57,7 @@
     "@multiformats/multiaddr": "^12.3.1",
     "@noble/secp256k1": "^2.1.0",
     "@waku/utils": "0.0.18",
-    "debug": "^4.3.7",
+    "debug": "^4.4.0",
     "js-sha3": "^0.9.2"
   },
   "devDependencies": {
