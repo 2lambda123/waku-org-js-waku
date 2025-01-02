@@ -63,7 +63,7 @@
     "@rollup/plugin-commonjs": "^28.0.1",
     "@waku/build-utils": "*",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "rollup": "^4.29.1"
   },
   "peerDependencies": {

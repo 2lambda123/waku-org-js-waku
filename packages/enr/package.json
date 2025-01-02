@@ -64,7 +64,7 @@
     "@libp2p/peer-id-factory": "^4.2.1",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@types/chai": "^5.0.1",
     "@types/mocha": "^10.0.10",
     "@waku/build-utils": "*",
