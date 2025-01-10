@@ -55,7 +55,7 @@
     "@libp2p/crypto": "^5.0.6",
     "@libp2p/peer-id": "^5.0.7",
     "@multiformats/multiaddr": "^12.3.4",
-    "@noble/secp256k1": "^2.1.0",
+    "@noble/secp256k1": "^2.2.3",
     "@waku/utils": "0.0.18",
     "debug": "^4.4.0",
     "js-sha3": "^0.9.2"
