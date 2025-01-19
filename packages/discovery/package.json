@@ -62,7 +62,7 @@
     "uint8arrays": "^5.0.1"
   },
   "devDependencies": {
-    "@libp2p/peer-id": "^5.0.7",
+    "@libp2p/peer-id": "^5.0.10",
     "@libp2p/peer-id-factory": "^4.2.1",
     "@multiformats/multiaddr": "^12.3.4",
     "@rollup/plugin-commonjs": "^28.0.1",
